@@ -24,7 +24,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QSerialPort *serialPort, QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void write(const QByteArray &writeData);
 
@@ -35,17 +35,19 @@ private slots:
     void handleReadTimeout();
     void handleError(QSerialPort::SerialPortError error);
 
+    void on_actionConnect_triggered();
+
 private:
     void processReadData();
     void processLine(QByteArray *a);
     void updateValues();
+    void openSerialport(QString name);
 
     Ui::MainWindow *ui;
     QSerialPort     *m_serialPort;
     QByteArray      m_writeData;
     QByteArray  m_readData;
     QByteArray outputBuffer;
-    QTextStream     m_standardOutput;
     qint64          m_bytesWritten;
     QTimer          m_readtimer;
     QTimer          m_writetimer;

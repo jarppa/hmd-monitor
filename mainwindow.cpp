@@ -2,17 +2,18 @@
 #include "ui_mainwindow.h"
 #include "indicatorellipse.h"
 
+#include <QInputDialog>
+#include <QDir>
+#include <QSerialPort>
+
 #include <QDebug>
 
-#define OUTPUT_MAXSIZE 128
-
-MainWindow::MainWindow(QSerialPort *serialPort, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_serialPort(serialPort)
-    ,m_standardOutput(stdout)
-    ,m_bytesWritten(0)
-{
+    m_bytesWritten(0)
+{    
+    m_serialPort = new QSerialPort();
 
     m_writetimer.setSingleShot(true);
     connect(m_serialPort, SIGNAL(bytesWritten(qint64)), SLOT(handleBytesWritten(qint64)));
@@ -169,4 +170,54 @@ void MainWindow::updateValues() {
     //qDebug() << scene->width();
     scene->setSceneRect(ui->graphicsView->rect());
     ellipse->setPos(x_offset, y_offset);
+}
+
+void MainWindow::on_actionConnect_triggered()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                            tr("Serial port:"), QLineEdit::Normal,
+                                            QDir::home().dirName(), &ok);
+    /*if (ok && !text.isEmpty())
+        textLabel->setText(text);*/
+    openSerialport(text);
+}
+
+void MainWindow::openSerialport(QString name) {
+
+    if (m_serialPort->isOpen())
+        m_serialPort->close();
+    //QString serialPortName = "COM12";
+    m_serialPort->setPortName(name);
+
+    if (!m_serialPort->open(QIODevice::ReadWrite)) {
+        qDebug() << QObject::tr("Failed to open port %1, error: %2").arg(name).arg(m_serialPort->errorString()) << endl;
+        //return 1;
+    }
+
+    int serialPortBaudRate = QSerialPort::Baud9600;
+    if (!m_serialPort->setBaudRate(serialPortBaudRate)) {
+        qDebug() << QObject::tr("Failed to set 9600 baud for port %1, error: %2").arg(name).arg(m_serialPort->errorString()) << endl;
+        //return 1;
+    }
+
+    if (!m_serialPort->setDataBits(QSerialPort::Data8)) {
+        qDebug() << QObject::tr("Failed to set 8 data bits for port %1, error: %2").arg(name).arg(m_serialPort->errorString()) << endl;
+        //return 1;
+    }
+
+    if (!m_serialPort->setParity(QSerialPort::NoParity)) {
+        qDebug() << QObject::tr("Failed to set no parity for port %1, error: %2").arg(name).arg(m_serialPort->errorString()) << endl;
+        //return 1;
+    }
+
+    if (!m_serialPort->setStopBits(QSerialPort::OneStop)) {
+        qDebug() << QObject::tr("Failed to set 1 stop bit for port %1, error: %2").arg(name).arg(m_serialPort->errorString()) << endl;
+        //return 1;
+    }
+
+    if (!m_serialPort->setFlowControl(QSerialPort::NoFlowControl)) {
+        qDebug() << QObject::tr("Failed to set no flow control for port %1, error: %2").arg(name).arg(m_serialPort->errorString()) << endl;
+        //return 1;
+    }
 }
