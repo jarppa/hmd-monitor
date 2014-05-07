@@ -9,6 +9,10 @@
 #include <QByteArray>
 #include <QObject>
 
+#include <QGraphicsScene>
+
+#include "indicatorellipse.h"
+
 QT_USE_NAMESPACE
 
 namespace Ui {
@@ -51,5 +55,8 @@ private:
     QString mAccX;
     QString mAccY;
     QString mAccZ;
+
+    QGraphicsScene *scene;
+    IndicatorEllipse *ellipse;
 };
 #endif // MAINWINDOW_H

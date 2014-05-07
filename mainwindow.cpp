@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "indicatorellipse.h"
 
 #include <QDebug>
 
@@ -23,6 +24,20 @@ MainWindow::MainWindow(QSerialPort *serialPort, QWidget *parent) :
     //m_readtimer.start(5000);
 
     ui->setupUi(this);
+
+    scene = new QGraphicsScene(this);
+    ui->graphicsView->setScene(scene);
+
+    QPen p(Qt::red);
+    p.setWidth(2);
+
+    QBrush b(Qt::red);
+
+    //ellipse = scene->addEllipse(10, 10, 30, 30, p, b);
+    ellipse = new IndicatorEllipse();
+    //ellipse = scene->itemAt(0,0);
+    scene->addItem(ellipse);
+
 }
 
 MainWindow::~MainWindow()
@@ -101,7 +116,7 @@ void MainWindow::processReadData() {
     QByteArray last;
     QList<QByteArray> lines = m_readData.split('\n');
     foreach (QByteArray a, lines) {
-        qDebug() << a;
+        //qDebug() << a;
         if (a.endsWith('\r')) {
             processLine(&a);
         }else if (!a.endsWith('\r') && m_readData.endsWith(a)) {
@@ -136,4 +151,14 @@ void MainWindow::updateValues() {
     ui->accX_te->setText(mAccX);
     ui->accY_te->setText(mAccY);
     ui->accZ_te->setText(mAccZ);
+    ellipse->updateIndicator(mHeading.toInt(), mAmbient.toInt(),  mAccZ.toFloat());
+
+    int y_offset = (scene->height()/2) + ((mAccY.toFloat()/2.0f)*(scene->height()/2));
+
+    int x_offset = (scene->width()/2) + ((mAccX.toFloat()/1.5f)*(scene->width()/2));
+
+    //qDebug() << x_offset;
+    //qDebug() << scene->width();
+    scene->setSceneRect(ui->graphicsView->rect());
+    ellipse->setPos(x_offset, y_offset);
 }
