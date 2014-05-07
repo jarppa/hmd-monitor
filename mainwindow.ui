@@ -71,6 +71,9 @@
             <property name="text">
              <string>Heading</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
           <item>
@@ -103,6 +106,9 @@
             </property>
             <property name="text">
              <string>Ambient Light</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -137,6 +143,9 @@
             <property name="text">
              <string>Acceleration X</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
           <item>
@@ -170,6 +179,9 @@
             <property name="text">
              <string>Acceleration Y</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
           <item>
@@ -202,6 +214,9 @@
             </property>
             <property name="text">
              <string>Acceleration Z</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>

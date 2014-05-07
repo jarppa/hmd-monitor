@@ -5,24 +5,20 @@
 
 class IndicatorEllipse : public QGraphicsItem
 {
-    //Q_OBJECT
 
 public:
-    //IndicatorEllipse(QGraphicsItem *parent = 0);
-    //explicit IndicatorEllipse ();
     IndicatorEllipse ();
     QRectF boundingRect() const;
     QPainterPath shape() const;
-    //~IndicatorEllipse();
 
-    void updateIndicator(int heading, int ambient, float accz);
+    void updateIndicator(double heading, unsigned int ambient, float accz);
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                                      QWidget *widget);
 private:
     int rad;
-    int ori;
+    double ori;
     QColor color;
 };
 

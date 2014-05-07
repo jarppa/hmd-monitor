@@ -122,7 +122,7 @@ void MainWindow::processReadData() {
         }else if (!a.endsWith('\r') && m_readData.endsWith(a)) {
             last = a;
         }else
-            qDebug() << "HAAAALP";
+            qDebug() << "HAAAALP! Data corruption!";
 
     }
     m_readData.clear();
@@ -142,6 +142,14 @@ void MainWindow::processLine(QByteArray *a) {
         mAccY = vals.split(';')[1];
         mAccZ = vals.split(';')[2];
     }
+    else if (a->startsWith("CALIBRATION:")) {
+        QString cXmin, cXmax, cYmin, cYmax;
+        QByteArray vals = a->split(':')[1];
+        cXmin = vals.split(';')[0];
+        cXmax = vals.split(';')[1];
+        cYmin = vals.split(';')[2];
+        cYmax = vals.split(';')[3];
+    }
     updateValues();
 }
 
@@ -151,7 +159,7 @@ void MainWindow::updateValues() {
     ui->accX_te->setText(mAccX);
     ui->accY_te->setText(mAccY);
     ui->accZ_te->setText(mAccZ);
-    ellipse->updateIndicator(mHeading.toInt(), mAmbient.toInt(),  mAccZ.toFloat());
+    ellipse->updateIndicator(mHeading.toDouble(), mAmbient.toUInt(),  mAccZ.toFloat());
 
     int y_offset = (scene->height()/2) + ((mAccY.toFloat()/2.0f)*(scene->height()/2));
 
