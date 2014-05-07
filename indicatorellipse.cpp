@@ -43,7 +43,7 @@ void IndicatorEllipse::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QPen p = QPen();
     p.setColor(Qt::red);
     painter->setPen(p);
-    painter->drawLine(0,0,x,y);
+    painter->drawLine(0,0,x,-y);
     //painter->drawRect(boundingRect());
 }
 
