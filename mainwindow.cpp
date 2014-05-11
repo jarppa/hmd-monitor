@@ -5,8 +5,12 @@
 #include <QInputDialog>
 #include <QDir>
 #include <QSerialPort>
+#include <math.h>
 
 #include <QDebug>
+
+#define Y_ACC_THRESHOLD 0.5f
+#define X_ACC_THRESHOLD 0.5f
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    if (m_serialPort->isOpen())
+        m_serialPort->close();
     delete ui;
 }
 
@@ -154,6 +160,23 @@ void MainWindow::processLine(QByteArray *a) {
     updateValues();
 }
 
+
+static float meanOf(float *buf, int size) {
+    float ret = 0.0f;
+    for(int i=0;i<size;i++) {
+        ret += *buf++;
+    }
+    return ret/(float)size;
+}
+
+static int x_offset = 0;
+static int y_offset = 0;
+static const int rb_size = 2;
+static float x_acc_rbuf [rb_size];
+static float y_acc_rbuf [rb_size];
+static int i_yrb;
+static int i_xrb;
+
 void MainWindow::updateValues() {
     ui->heading_te->setText(mHeading);
     ui->ambient_te->setText(mAmbient);
@@ -162,9 +185,18 @@ void MainWindow::updateValues() {
     ui->accZ_te->setText(mAccZ);
     ellipse->updateIndicator(mHeading.toDouble(), mAmbient.toUInt(),  mAccZ.toFloat());
 
-    int y_offset = (scene->height()/2) + ((mAccY.toFloat()/2.0f)*(scene->height()/2));
+    /*int y_offset = (scene->height()/2) + ((mAccY.toFloat()/2.0f)*(scene->height()/2));
 
-    int x_offset = (scene->width()/2) + ((mAccX.toFloat()/1.5f)*(scene->width()/2));
+    int x_offset = (scene->width()/2) + ((mAccX.toFloat()/1.5f)*(scene->width()/2));*/
+
+    i_yrb = (i_yrb+1) % rb_size;
+    i_xrb = (i_xrb+1) % rb_size;
+
+    y_acc_rbuf[i_yrb] = mAccY.toFloat();
+    x_acc_rbuf[i_xrb] = mAccX.toFloat();
+
+    y_offset = (scene->height()/2) + ((meanOf(&y_acc_rbuf[0],rb_size)/2.0f)*(scene->height()/2));
+    x_offset = (scene->width()/2) + ((meanOf(&x_acc_rbuf[0],rb_size)/2.0f)*(scene->width()/2));
 
     //qDebug() << x_offset;
     //qDebug() << scene->width();
